@@ -181,17 +181,6 @@ class _SignInState extends State<SignIn> {
                           }
                         }
                       : null,
-
-                  // onTap: () {
-                  //   if (_formKey.currentState!.validate()) {
-                  //     Navigator.push(
-                  //       context,
-                  //       MaterialPageRoute(
-                  //         builder: (context) => const OnBoardingScreen(),
-                  //       ),
-                  //     );
-                  //   }
-                  // },
                   child: Container(
                     height: 40,
                     width: MediaQuery.of(context).size.width / 1.1,
