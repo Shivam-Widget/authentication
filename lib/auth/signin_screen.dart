@@ -47,13 +47,11 @@ class _SignInState extends State<SignIn> {
   accessToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString(GetAllData().accessToken!);
-    if(token != null && token.isNotEmpty) {
+    if (token != null && token.isNotEmpty) {
       return 'Bearer $token';
     }
     return null;
   }
-
-
 
   void postData() async {
     http.Response response = await http.post(
