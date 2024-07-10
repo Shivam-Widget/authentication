@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ForgotPassWordScreen extends StatefulWidget {
   const ForgotPassWordScreen({super.key});
@@ -15,6 +17,13 @@ class _ForgotPassWordScreenState extends State<ForgotPassWordScreen> {
   TextEditingController emailController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey();
   bool _isvalid = false;
+  final _url = Uri.parse('https://dev.upflyte.com/resetpassword?Token=');
+
+  Future<void> _launchUrl() async {
+    if (!await launchUrl(_url)) {
+      throw Exception('Could not launch $_url');
+    }
+  }
 
   String? validateEmail(String? value) {
     const pattern = '@';
@@ -31,33 +40,64 @@ class _ForgotPassWordScreenState extends State<ForgotPassWordScreen> {
     });
   }
 
+  Future<String?> getToken() async {
+    final pref = await SharedPreferences.getInstance();
+    return pref.getString('accessToken');
+  }
 
   void postData() async {
-    http.Response response = await http.post(
-      Uri.parse(
-          'https://fly-manager-dev-api.azurewebsites.net/api/Account/login'),
-      headers: {
-        'accept': '*/*',
-        'Authorization': '',
-        'Content-Type': 'application/json-patch+json',
-      },
-      body: jsonEncode(
-        <String, String>{
-          "email": emailController.text,
-          "timeZone": "Asia/Kolkata",
-          "deviceType": "string",
-        },
-      ),
-    );
+    var token = await getToken();
 
-    if (response.statusCode == 200) {
-      String data = response.body;
-      var decodedData = jsonDecode(data);
-      debugPrint('---- DecodeData ------> $decodedData');
-      debugPrint('--- Status Code ----> ${response.statusCode}');
-    } else {
-      debugPrint('--- Bed Response ----> ${response.statusCode}');
+    try {
+      http.Response res = await http.get(
+        Uri.parse(
+            'https://fly-manager-dev-api.azurewebsites.net/api/Account/forgotpassword'),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json-patch+json',
+        },
+      );
+
+      debugPrint('token: $token');
+
+      if (res.statusCode == 200) {
+        String data = res.body;
+        var decodedData = jsonDecode(data);
+        debugPrint('---- DecodeData ----> $decodedData');
+        debugPrint('---- Status Code ----> ${res.statusCode}');
+      } else {
+        debugPrint('---- Bed Response ----> ${res.statusCode}');
+      }
+    } catch (e) {
+      debugPrint("token $token");
     }
+
+    // http.Response res = await http.post(
+    //   Uri.parse(
+    //       'https://fly-manager-dev-api.azurewebsites.net/api/Account/login'),
+    //   headers: {
+    //     'accept': '*/*',
+    //     'Authorization': 'Bearer $token',
+    //     'Content-Type': 'application/json-patch+json',
+    //   },
+    //   body: jsonEncode(
+    //     <String, String>{
+    //       "email": emailController.text,
+    //       "timeZone": "Asia/Kolkata",
+    //       "deviceType": "string",
+    //     },
+    //   ),
+    // );
+
+    // if (res.statusCode == 200) {
+    //   String data = res.body;
+    //   var decodedData = jsonDecode(data);
+    //   debugPrint('---- DecodeData ----> $decodedData');
+    //   debugPrint('---- Status Code ----> ${res.statusCode}');
+    // } else {
+    //   debugPrint('---- Bed Response ----> ${res.statusCode}');
+    // }
   }
 
   @override
@@ -123,8 +163,7 @@ class _ForgotPassWordScreenState extends State<ForgotPassWordScreen> {
                   onTap: _isvalid
                       ? () async {
                           if (_formKey.currentState!.validate()) {
-
-
+                            _launchUrl();
                           }
                         }
                       : null,
