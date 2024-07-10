@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:url_launcher/url_launcher.dart';
 
 class ForgotPassWordScreen extends StatefulWidget {
   const ForgotPassWordScreen({super.key});
@@ -14,13 +13,14 @@ class _ForgotPassWordScreenState extends State<ForgotPassWordScreen> {
   TextEditingController emailController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey();
   bool _isvalid = false;
-  final _url = Uri.parse('https://dev.upflyte.com/resetpassword?Token=');
 
-  Future<void> _launchUrl() async {
-    if (!await launchUrl(_url)) {
-      throw Exception('Could not launch $_url');
-    }
-  }
+  // final _url = Uri.parse('https://dev.upflyte.com/resetpassword?Token=');
+  //
+  // Future<void> _launchUrl() async {
+  //   if (!await launchUrl(_url)) {
+  //     throw Exception('Could not launch $_url');
+  //   }
+  // }
 
   String? validateEmail(String? value) {
     const pattern = '@';
@@ -32,13 +32,16 @@ class _ForgotPassWordScreenState extends State<ForgotPassWordScreen> {
   }
 
   void onChange() {
-    setState(() {
-      _isvalid = _formKey.currentState!.validate();
-    });
+    setState(
+      () {
+        _isvalid = _formKey.currentState!.validate();
+      },
+    );
   }
 
-  void forgotpassword() async {
+  Map msgMap = {};
 
+  void forgotpassword() async {
     try {
       http.Response res = await http.post(
         Uri.parse(
@@ -50,16 +53,28 @@ class _ForgotPassWordScreenState extends State<ForgotPassWordScreen> {
         body: jsonEncode(
           <String, String>{
             "email": emailController.text,
-            "timeZone": "Asia/Kolkata",
-            "deviceType": "string",
+            "resetURL": "https://dev.upflyte.com/resetpassword?Token="
           },
         ),
       );
-
       if (res.statusCode == 200) {
-        String data = res.body;
-        var decodedData = jsonDecode(data);
-        debugPrint('---- DecodeData ----> $decodedData');
+        var data = jsonDecode(res.body);
+
+        setState(() {
+          msgMap.addAll(data);
+        });
+
+        debugPrint('---- DecodeData ----> $data');
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              msgMap['message'],
+            ),
+          ),
+        );
+
+        debugPrint('---- message ----> ${msgMap['message']}');
         debugPrint('---- Status Code ----> ${res.statusCode}');
       } else {
         debugPrint('---- Bed Response ----> ${res.statusCode}');
@@ -134,9 +149,6 @@ class _ForgotPassWordScreenState extends State<ForgotPassWordScreen> {
                           if (_formKey.currentState!.validate()) {
                             forgotpassword();
                           }
-                          // if (_formKey.currentState!.validate()) {
-                          //   _launchUrl();
-                          // }
                         }
                       : null,
                   child: Container(

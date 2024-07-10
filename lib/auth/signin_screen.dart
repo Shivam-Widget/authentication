@@ -1,9 +1,11 @@
 import 'dart:convert';
-import 'package:authentication/forgotpassword_screen.dart';
+import 'package:authentication/forgotpassword/forgotpassword_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../models/login_model.dart';
 
 final Uri _url = Uri.parse('https://dev.upflyte.com/Registration');
 
@@ -41,6 +43,17 @@ class _SignInState extends State<SignIn> {
       _isvalid = _formKey.currentState!.validate();
     });
   }
+
+  accessToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString(GetAllData().accessToken!);
+    if(token != null && token.isNotEmpty) {
+      return 'Bearer $token';
+    }
+    return null;
+  }
+
+
 
   void postData() async {
     http.Response response = await http.post(
