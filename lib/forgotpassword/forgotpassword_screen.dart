@@ -1,9 +1,6 @@
 import 'dart:convert';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ForgotPassWordScreen extends StatefulWidget {
@@ -40,26 +37,24 @@ class _ForgotPassWordScreenState extends State<ForgotPassWordScreen> {
     });
   }
 
-  Future<String?> getToken() async {
-    final pref = await SharedPreferences.getInstance();
-    return pref.getString('accessToken');
-  }
-
-  void postData() async {
-    var token = await getToken();
+  void forgotpassword() async {
 
     try {
-      http.Response res = await http.get(
+      http.Response res = await http.post(
         Uri.parse(
             'https://fly-manager-dev-api.azurewebsites.net/api/Account/forgotpassword'),
         headers: {
           'accept': '*/*',
-          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json-patch+json',
         },
+        body: jsonEncode(
+          <String, String>{
+            "email": emailController.text,
+            "timeZone": "Asia/Kolkata",
+            "deviceType": "string",
+          },
+        ),
       );
-
-      debugPrint('token: $token');
 
       if (res.statusCode == 200) {
         String data = res.body;
@@ -70,34 +65,8 @@ class _ForgotPassWordScreenState extends State<ForgotPassWordScreen> {
         debugPrint('---- Bed Response ----> ${res.statusCode}');
       }
     } catch (e) {
-      debugPrint("token $token");
+      debugPrint("---------> $e");
     }
-
-    // http.Response res = await http.post(
-    //   Uri.parse(
-    //       'https://fly-manager-dev-api.azurewebsites.net/api/Account/login'),
-    //   headers: {
-    //     'accept': '*/*',
-    //     'Authorization': 'Bearer $token',
-    //     'Content-Type': 'application/json-patch+json',
-    //   },
-    //   body: jsonEncode(
-    //     <String, String>{
-    //       "email": emailController.text,
-    //       "timeZone": "Asia/Kolkata",
-    //       "deviceType": "string",
-    //     },
-    //   ),
-    // );
-
-    // if (res.statusCode == 200) {
-    //   String data = res.body;
-    //   var decodedData = jsonDecode(data);
-    //   debugPrint('---- DecodeData ----> $decodedData');
-    //   debugPrint('---- Status Code ----> ${res.statusCode}');
-    // } else {
-    //   debugPrint('---- Bed Response ----> ${res.statusCode}');
-    // }
   }
 
   @override
@@ -163,8 +132,11 @@ class _ForgotPassWordScreenState extends State<ForgotPassWordScreen> {
                   onTap: _isvalid
                       ? () async {
                           if (_formKey.currentState!.validate()) {
-                            _launchUrl();
+                            forgotpassword();
                           }
+                          // if (_formKey.currentState!.validate()) {
+                          //   _launchUrl();
+                          // }
                         }
                       : null,
                   child: Container(
