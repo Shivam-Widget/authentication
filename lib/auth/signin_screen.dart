@@ -27,6 +27,7 @@ class _SignInState extends State<SignIn> {
   bool isPassword = false;
   final GlobalKey<FormState> _formKey = GlobalKey();
   bool _isvalid = false;
+  bool _isvalids = false;
 
   String? validateEmail(String? value) {
     const pattern = '@';
@@ -37,9 +38,14 @@ class _SignInState extends State<SignIn> {
         : null;
   }
 
+  String? validatePassword(String? v) {
+    return v!.isEmpty || v.length < 6 ? 'Please enter a valid Password' : null;
+  }
+
   void onChange() {
     setState(() {
       _isvalid = _formKey.currentState!.validate();
+      _isvalids = _formKey.currentState!.validate();
     });
   }
 
@@ -94,9 +100,6 @@ class _SignInState extends State<SignIn> {
           padding: const EdgeInsets.all(20),
           child: Form(
             key: _formKey,
-            onChanged: () {
-              onChange();
-            },
             child: Column(
               children: [
                 const SizedBox(
@@ -155,6 +158,9 @@ class _SignInState extends State<SignIn> {
                   height: 20,
                 ),
                 TextFormField(
+                  onChanged: (value) {
+                    onChange();
+                  },
                   validator: validateEmail,
                   keyboardType: TextInputType.emailAddress,
                   controller: emailController,
@@ -173,12 +179,10 @@ class _SignInState extends State<SignIn> {
                   height: 20,
                 ),
                 TextFormField(
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter valid password!';
-                    }
-                    return null;
+                  onChanged: (v) {
+                    onChange();
                   },
+                  validator: validatePassword,
                   controller: passwordController,
                   obscureText: !isPassword,
                   decoration: InputDecoration(
@@ -231,7 +235,7 @@ class _SignInState extends State<SignIn> {
                   height: 20,
                 ),
                 GestureDetector(
-                  onTap: _isvalid
+                  onTap: _isvalid && _isvalids
                       ? () async {
                           if (_formKey.currentState!.validate()) {
                             postData();
