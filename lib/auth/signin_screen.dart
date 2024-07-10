@@ -1,5 +1,17 @@
-import 'package:authentication/onboarding_screen.dart';
+import 'dart:convert';
+import 'package:authentication/forgotpassword_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+final Uri _url = Uri.parse('https://dev.upflyte.com/Registration');
+
+Future<void> _launchUrl() async {
+  if (!await launchUrl(_url)) {
+    throw Exception('Could not launch $_url');
+  }
+}
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -28,6 +40,34 @@ class _SignInState extends State<SignIn> {
     setState(() {
       _isvalid = _formKey.currentState!.validate();
     });
+  }
+
+  void postData() async {
+    http.Response response = await http.post(
+      Uri.parse(
+          'https://fly-manager-dev-api.azurewebsites.net/api/Account/login'),
+      headers: {
+        'accept': '*/*',
+        'Content-Type': 'application/json-patch+json',
+      },
+      body: jsonEncode(
+        <String, String>{
+          "email": emailController.text,
+          "password": passwordController.text,
+          "timeZone": "Asia/Kolkata",
+          "deviceType": "string",
+        },
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      String data = response.body;
+      var decodedData = jsonDecode(data);
+      debugPrint('---- DecodeData ------> $decodedData');
+      debugPrint('--- Status Code ----> ${response.statusCode}');
+    } else {
+      debugPrint('--- Bed Response ----> ${response.statusCode}');
+    }
   }
 
   @override
@@ -81,7 +121,7 @@ class _SignInState extends State<SignIn> {
                       style: TextStyle(fontSize: 20),
                     ),
                     SizedBox(
-                      width: 15,
+                      width: 5,
                     ),
                     Text(
                       'Back,',
@@ -114,6 +154,7 @@ class _SignInState extends State<SignIn> {
                     prefixIcon: Icon(
                       Icons.email_outlined,
                       color: Colors.grey,
+                      size: 20,
                     ),
                     border: OutlineInputBorder(),
                   ),
@@ -123,7 +164,7 @@ class _SignInState extends State<SignIn> {
                 ),
                 TextFormField(
                   validator: (value) {
-                    if (value == null || value.isEmpty || value.length < 6) {
+                    if (value == null || value.isEmpty) {
                       return 'Please enter valid password!';
                     }
                     return null;
@@ -136,6 +177,7 @@ class _SignInState extends State<SignIn> {
                     prefixIcon: const Icon(
                       Icons.lock_outline,
                       color: Colors.grey,
+                      size: 20,
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -154,13 +196,23 @@ class _SignInState extends State<SignIn> {
                 const SizedBox(
                   height: 20,
                 ),
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(
-                      'Forgot Password?',
-                      style: TextStyle(
-                        color: Color(0xFF1E374F),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ForgotPassWordScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        'Forgot Password?',
+                        style: TextStyle(
+                          color: Color(0xFF1E374F),
+                        ),
                       ),
                     ),
                   ],
@@ -170,14 +222,9 @@ class _SignInState extends State<SignIn> {
                 ),
                 GestureDetector(
                   onTap: _isvalid
-                      ? () {
+                      ? () async {
                           if (_formKey.currentState!.validate()) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const OnBoardingScreen(),
-                              ),
-                            );
+                            postData();
                           }
                         }
                       : null,
@@ -185,7 +232,9 @@ class _SignInState extends State<SignIn> {
                     height: 40,
                     width: MediaQuery.of(context).size.width / 1.1,
                     decoration: BoxDecoration(
-                      color: _isvalid ? const Color(0xFF1E374F) : Colors.grey,
+                      color: _isvalid
+                          ? const Color(0xFF1E374F)
+                          : const Color(0xFFD9D9D9),
                       borderRadius: BorderRadius.circular(5),
                     ),
                     child: const Center(
@@ -203,17 +252,20 @@ class _SignInState extends State<SignIn> {
                 const SizedBox(
                   height: 10,
                 ),
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Don't have an account?"),
-                    SizedBox(
+                    const Text("Don't have an account?"),
+                    const SizedBox(
                       width: 5,
                     ),
-                    Text(
-                      'Sign Up',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
+                    GestureDetector(
+                      onTap: _launchUrl,
+                      child: const Text(
+                        'Sign Up',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    )
                   ],
                 ),
                 const SizedBox(
