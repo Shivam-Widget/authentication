@@ -70,10 +70,13 @@ class _ForgotPassWordScreenState extends State<ForgotPassWordScreen> {
           SnackBar(
             content: Text(
               msgMap['message'],
+              style: const TextStyle(color: Colors.black),
             ),
+            elevation: 20,
+            duration: const Duration(seconds: 3),
+            backgroundColor: Colors.black12,
           ),
         );
-
         debugPrint('---- message ----> ${msgMap['message']}');
         debugPrint('---- Status Code ----> ${res.statusCode}');
       } else {
