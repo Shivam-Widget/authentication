@@ -1,7 +1,9 @@
 import 'package:authentication/onboarding/onboarding_screen.dart';
+import 'package:authentication/provider/aircraft_provider.dart';
+import 'package:authentication/screens/aircraft_list.dart';
 import 'package:authentication/sharedprefrences/SharedPrefs.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,10 +16,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      home: OnBoardingScreen(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<AircraftProvider>(
+          create: (context) => AircraftProvider(),
+        ),
+      ],
+      child: const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        home: OnBoardingScreen(),
+      ),
     );
   }
 }
