@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:authentication/forgotpassword/forgotpassword_screen.dart';
+import 'package:authentication/screens/aircraft_list.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/login_model.dart';
+import '../services/api_service.dart';
 
 final Uri _url = Uri.parse('https://dev.upflyte.com/Registration');
 
@@ -49,13 +51,26 @@ class _SignInState extends State<SignIn> {
     });
   }
 
-  accessToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString(GetAllData().accessToken!);
-    if (token != null && token.isNotEmpty) {
-      return 'Bearer $token';
-    }
-    return null;
+  // accessToken() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? token = prefs.getString(GetAllData().accessToken!);
+  //   if (token != null && token.isNotEmpty) {
+  //     return 'Bearer $token';
+  //   }
+  //   return null;
+  // }
+
+  final ApiService _apiService = ApiService();
+
+  void _login() async {
+    final loginModel = await _apiService.login(
+      email: emailController.text,
+      password: passwordController.text,
+    );
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const AirCraftList()),
+    );
   }
 
   void postData() async {
@@ -238,7 +253,7 @@ class _SignInState extends State<SignIn> {
                   onTap: _isvalid && _isvalids
                       ? () async {
                           if (_formKey.currentState!.validate()) {
-                            postData();
+                            _login();
                           }
                         }
                       : null,

@@ -151,6 +151,9 @@ class _ForgotPassWordScreenState extends State<ForgotPassWordScreen> {
                       ? () async {
                           if (_formKey.currentState!.validate()) {
                             forgotpassword();
+                            setState(() {
+                              emailController.clear();
+                            });
                           }
                         }
                       : null,
