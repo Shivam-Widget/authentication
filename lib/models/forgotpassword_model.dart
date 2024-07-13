@@ -1,15 +1,3 @@
-// To parse this JSON data, do
-//
-//     final welcome = welcomeFromJson(jsonString);
-
-import 'dart:convert';
-
-ForgotPasswordModel forgotPasswordFromJson(String str) =>
-    ForgotPasswordModel.fromJson(json.decode(str));
-
-String forgotPasswordToJson(ForgotPasswordModel data) =>
-    json.encode(data.toJson());
-
 class ForgotPasswordModel {
   bool? data;
   dynamic exception;

@@ -1,13 +1,3 @@
-// To parse this JSON data, do
-//
-//     final welcome = welcomeFromJson(jsonString);
-
-import 'dart:convert';
-
-AirCraftModel welcomeFromJson(String str) => AirCraftModel.fromJson(json.decode(str));
-
-String welcomeToJson(AirCraftModel data) => json.encode(data.toJson());
-
 class AirCraftModel {
   List<Datum>? data;
   dynamic exception;
