@@ -10,7 +10,9 @@ class SchedulesScreen extends StatefulWidget {
 class _SchedulesScreenState extends State<SchedulesScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Scaffold(
+      body: Center(child: Text('Schedule')),
+    );
   }
 }
 

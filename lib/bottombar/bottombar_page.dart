@@ -1,5 +1,6 @@
 import 'package:authentication/screens/aircraft_list.dart';
 import 'package:authentication/screens/reservation_list.dart';
+import 'package:authentication/screens/schedules_screen.dart';
 import 'package:flutter/material.dart';
 import '../screens/dashboard.dart';
 
@@ -59,6 +60,7 @@ class _MainPageState extends State<MainPage> {
     Dashboard(),
     ReservationList(),
     AirCraftList(),
+    SchedulesScreen(),
     Text(
       'Scheduled',
       style: optionStyle,
@@ -87,10 +89,6 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    void _openEndDrawer() {
-      _scaffoldKey.currentState!.openEndDrawer();
-    }
-
     return Scaffold(
       key: _scaffoldKey,
       body: Center(
@@ -100,7 +98,7 @@ class _MainPageState extends State<MainPage> {
         type: BottomNavigationBarType.fixed,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Container(
+            icon: SizedBox(
               height: 24,
               width: 24,
               child: Image.asset('assets/images/ic_home.png',
@@ -109,7 +107,7 @@ class _MainPageState extends State<MainPage> {
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Container(
+            icon: SizedBox(
               height: 24,
               width: 24,
               child: Image.asset('assets/images/ic_voucher.png',
@@ -118,7 +116,7 @@ class _MainPageState extends State<MainPage> {
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Container(
+            icon: SizedBox(
               height: 24,
               width: 24,
               child: Image.asset('assets/images/ic_plain.png',
@@ -127,7 +125,7 @@ class _MainPageState extends State<MainPage> {
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Container(
+            icon: SizedBox(
               height: 24,
               width: 24,
               child: Image.asset('assets/images/ic_calendar.png',
@@ -136,11 +134,10 @@ class _MainPageState extends State<MainPage> {
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Container(
+            icon: SizedBox(
               height: 24,
               width: 24,
               child: GestureDetector(
-                onTap: _openEndDrawer,
                 child: Image.asset('assets/images/ic_menu.png',
                     color: iconColors[4]),
               ), // Set color here
@@ -156,13 +153,13 @@ class _MainPageState extends State<MainPage> {
         child: Column(
           children: [
             Container(
-              height: 150,
-              color: Color(0xFF1E374F),
+              height: 100,
+              color: const Color(0xFF1E374F),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Container(
-                height: MediaQuery.of(context).size.height / 1.3,
+                height: MediaQuery.of(context).size.height / 1.2,
                 width: MediaQuery.of(context).size.width,
                 color: Colors.white,
                 child: Column(
@@ -174,7 +171,7 @@ class _MainPageState extends State<MainPage> {
                         return Column(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.only(top: 10, left: 8),
+                              padding: const EdgeInsets.only(left: 8),
                               child: Row(
                                 children: [
                                   Container(
@@ -182,7 +179,7 @@ class _MainPageState extends State<MainPage> {
                                     width: 25,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(3),
-                                      color: Colors.grey.withOpacity(0.3),
+                                      color: Colors.grey.withOpacity(0.2),
                                     ),
                                     child: Image.asset(
                                       'assets/images/ic_plain.png',
@@ -190,29 +187,29 @@ class _MainPageState extends State<MainPage> {
                                       color: Colors.black,
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 10,
                                   ),
                                   Text(
                                     '${menuList[i]['name']}',
-                                    style: TextStyle(color: Colors.black),
+                                    style: const TextStyle(color: Colors.black),
                                   ),
                                 ],
                               ),
                             ),
-                            SizedBox(
-                              height: 10,
+                            const SizedBox(
+                              height: 20,
                             ),
                           ],
                         );
                       },
                     ),
-                    Spacer(),
-                    Text(
+                    const Spacer(),
+                    const Text(
                       'Dev Version: 1.2.4 (50)',
                       style: TextStyle(color: Colors.grey),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                   ],

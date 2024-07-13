@@ -113,7 +113,7 @@ class _ReservationListState extends State<ReservationList> {
                   ListView.builder(
                     shrinkWrap: true,
                     scrollDirection: Axis.vertical,
-                    physics: ScrollPhysics(),
+                    physics: const ScrollPhysics(),
                     controller: _scrollController,
                     itemCount: postModel.reservation.data?.length ?? 0,
                     itemBuilder: (BuildContext ctx, int i) {
