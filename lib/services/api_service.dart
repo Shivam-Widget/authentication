@@ -182,10 +182,10 @@ class ApiService {
         body: jsonBody,
       );
       if (response.statusCode == 200) {
-        final item = json.decode(response.body);
-        debugPrint(item.toString());
+        final data = json.decode(response.body);
+        debugPrint(data.toString());
         return ReservationModel.fromJson(
-            item); // Mapping json response to our data model
+            data); // Mapping json response to our data model
       } else {
         debugPrint('Error occurred: ${response.statusCode} ${response.body}');
         return null;

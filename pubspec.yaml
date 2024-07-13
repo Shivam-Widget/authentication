@@ -40,6 +40,7 @@ dependencies:
   shared_preferences: any
   provider: any
   intl: any
+  cached_network_image: any
 
 dev_dependencies:
   flutter_test:

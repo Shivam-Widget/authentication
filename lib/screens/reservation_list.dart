@@ -110,154 +110,165 @@ class _ReservationListState extends State<ReservationList> {
                       ),
                     ),
                   ),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.vertical,
-                    physics: const ScrollPhysics(),
-                    controller: _scrollController,
-                    itemCount: postModel.reservation.data?.length ?? 0,
-                    itemBuilder: (BuildContext ctx, int i) {
-                      DateTime startDateTime = DateTime.parse(
-                          postModel.reservation.data?[i].startDateTime ?? '');
-                      String formattedStartDate =
-                          DateFormat('MMM dd, yyyy').format(startDateTime);
-                      String formattedStartTime =
-                          DateFormat.jm().format(startDateTime);
-                      DateTime endDateTime = DateTime.parse(
-                          postModel.reservation.data?[i].endDateTime ?? '');
-                      String formattedEndDate =
-                          DateFormat('MMM dd, yyyy').format(endDateTime);
-                      String formattedEndTime =
-                          DateFormat.jm().format(endDateTime);
-                      String flightStatus =
-                          postModel.reservation.data?[i].flightStatus ?? '';
+                  Container(
+                    height: MediaQuery.of(context).size.height,
+                    width: MediaQuery.of(context).size.width,
+                    color: Colors.grey.shade200,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          ListView.builder(
+                            shrinkWrap: true,
+                            scrollDirection: Axis.vertical,
+                            physics: const ScrollPhysics(),
+                            controller: _scrollController,
+                            itemCount: postModel.reservation.data?.length ?? 0,
+                            itemBuilder: (BuildContext ctx, int i) {
+                              DateTime startDateTime = DateTime.parse(
+                                  postModel.reservation.data?[i].startDateTime ?? '');
+                              String formattedStartDate =
+                                  DateFormat('MMM dd, yyyy').format(startDateTime);
+                              String formattedStartTime =
+                                  DateFormat.jm().format(startDateTime);
+                              DateTime endDateTime = DateTime.parse(
+                                  postModel.reservation.data?[i].endDateTime ?? '');
+                              String formattedEndDate =
+                                  DateFormat('MMM dd, yyyy').format(endDateTime);
+                              String formattedEndTime =
+                                  DateFormat.jm().format(endDateTime);
+                              String flightStatus =
+                                  postModel.reservation.data?[i].flightStatus ?? '';
 
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 3),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          height: 150,
-                          color: Colors.white,
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          postModel.reservation.data?[i]
-                                                  .scheduleActivityName ??
-                                              '',
-                                          style: const TextStyle(
-                                              color: Colors.grey, fontSize: 12),
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 3),
+                                child: Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  height: 150,
+                                  color: Colors.white,
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  postModel.reservation.data?[i]
+                                                          .scheduleActivityName ??
+                                                      '',
+                                                  style: const TextStyle(
+                                                      color: Colors.grey, fontSize: 12),
+                                                ),
+                                                Text(
+                                                  postModel.reservation.data?[i]
+                                                          .tailNo ??
+                                                      '',
+                                                  style: const TextStyle(
+                                                      color: Colors.black,
+                                                      fontWeight: FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
+                                            const Spacer(),
+                                            Container(
+                                              height: 30,
+                                              width: 100,
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    getFlightStatusColor(flightStatus),
+                                                borderRadius: BorderRadius.circular(3),
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  flightStatus,
+                                                  style: TextStyle(
+                                                      color: getFlightStatusTextcolor(
+                                                          flightStatus)),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        Text(
-                                          postModel.reservation.data?[i]
-                                                  .tailNo ??
-                                              '',
-                                          style: const TextStyle(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
-                                    ),
-                                    const Spacer(),
-                                    Container(
-                                      height: 30,
-                                      width: 100,
-                                      decoration: BoxDecoration(
-                                        color:
-                                            getFlightStatusColor(flightStatus),
-                                        borderRadius: BorderRadius.circular(3),
                                       ),
-                                      child: Center(
-                                        child: Text(
-                                          flightStatus,
-                                          style: TextStyle(
-                                              color: getFlightStatusTextcolor(
-                                                  flightStatus)),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              postModel.reservation.data?[i]
+                                                      .departureAirportName ??
+                                                  '',
+                                              style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            const Spacer(),
+                                            Image.asset(
+                                              'assets/images/aircratimages/ic_aircraftline.png',
+                                              scale: 3,
+                                            ),
+                                            const Spacer(),
+                                            Text(
+                                              postModel.reservation.data?[i]
+                                                      .arrivalAirportName ??
+                                                  '',
+                                              style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  formattedStartDate,
+                                                  style: const TextStyle(
+                                                      color: Colors.grey, fontSize: 14),
+                                                ),
+                                                Text(
+                                                  formattedStartTime,
+                                                  style: const TextStyle(
+                                                      color: Colors.grey, fontSize: 14),
+                                                ),
+                                              ],
+                                            ),
+                                            const Spacer(),
+                                            Column(
+                                              children: [
+                                                Text(
+                                                  formattedEndDate,
+                                                  style: const TextStyle(
+                                                      color: Colors.grey, fontSize: 14),
+                                                ),
+                                                Text(
+                                                  formattedEndTime,
+                                                  style: const TextStyle(
+                                                      color: Colors.grey, fontSize: 14),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      postModel.reservation.data?[i]
-                                              .departureAirportName ??
-                                          '',
-                                      style: const TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    const Spacer(),
-                                    Image.asset(
-                                      'assets/images/aircratimages/ic_aircraftline.png',
-                                      scale: 3,
-                                    ),
-                                    const Spacer(),
-                                    Text(
-                                      postModel.reservation.data?[i]
-                                              .arrivalAirportName ??
-                                          '',
-                                      style: const TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          formattedStartDate,
-                                          style: const TextStyle(
-                                              color: Colors.grey, fontSize: 14),
-                                        ),
-                                        Text(
-                                          formattedStartTime,
-                                          style: const TextStyle(
-                                              color: Colors.grey, fontSize: 14),
-                                        ),
-                                      ],
-                                    ),
-                                    const Spacer(),
-                                    Column(
-                                      children: [
-                                        Text(
-                                          formattedEndDate,
-                                          style: const TextStyle(
-                                              color: Colors.grey, fontSize: 14),
-                                        ),
-                                        Text(
-                                          formattedEndTime,
-                                          style: const TextStyle(
-                                              color: Colors.grey, fontSize: 14),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              )
-                            ],
+                              );
+                            },
                           ),
-                        ),
-                      );
-                    },
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),

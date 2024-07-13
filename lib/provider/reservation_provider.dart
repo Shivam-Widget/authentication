@@ -49,7 +49,7 @@ class ReservationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  getReservaionDetailData(context,int id) async {
+  getReservationDetailData(context,int id) async {
     loading = true;
     // ReservationDetailModel? result = await services.getReservationDetail(context,id);
     // reservationDetailModel = result ?? ReservationDetailModel();
