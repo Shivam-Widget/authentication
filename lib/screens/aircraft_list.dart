@@ -64,7 +64,23 @@ class _AirCraftListState extends State<AirCraftList> {
           color: Color(0xFF1E374F),
         ),
       ),
-      body: SingleChildScrollView(
+      body: postModel.loading
+          ? Center(
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              const CircularProgressIndicator(
+                color: Colors.blue,
+                strokeWidth: 3,
+                strokeCap: StrokeCap.butt,
+              ),
+              Image.asset(
+                'assets/images/upflyte_launcher.png',
+                scale: 2,
+              )
+            ],
+          ))
+          : SingleChildScrollView(
         child: Column(
           children: [
             Container(

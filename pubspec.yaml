@@ -39,6 +39,7 @@ dependencies:
   http: any
   shared_preferences: any
   provider: any
+  intl: any
 
 dev_dependencies:
   flutter_test:

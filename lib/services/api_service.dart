@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:authentication/models/reservation_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,10 +12,9 @@ class ApiService {
   static const String _url =
       'https://fly-manager-dev-api.azurewebsites.net/api/Account/login';
   static String? accessToken = SharedPreferencesHelper.accessToken;
-
-  // static  int? compamyId = SharedPreferencesHelper.companyId;
-  // static  int? userId = SharedPreferencesHelper.userId;
-  // static  int? roleId = SharedPreferencesHelper.roleId;
+  static int? compamyId = SharedPreferencesHelper.companyId;
+  static int? userId = SharedPreferencesHelper.userId;
+  static int? roleId = SharedPreferencesHelper.roleId;
 
   Future<LoginModel?> login({
     required String email,
@@ -109,7 +109,6 @@ class ApiService {
     }
   }
 
-
   Future<AirCraftModel?> getAircraftlistData(context) async {
     AirCraftModel? aircraftListModel;
 
@@ -143,22 +142,97 @@ class ApiService {
       if (response.statusCode == 200) {
         final item = json.decode(response.body);
         debugPrint(item.toString());
-        return AirCraftModel.fromJson(item); // Mapping json response to our data model
+        return AirCraftModel.fromJson(
+            item); // Mapping json response to our data model
       } else {
         debugPrint('Error occurred: ${response.statusCode}');
         return null;
       }
-
-      // print('resbody $requestBody');
-      // print('res $response');
-      //
-      // if (response != null) {
-      //   aircraftListModel = AirCraftModel.fromJson(response);
-      // }
-
     } catch (e) {
       debugPrint('Error Occurred' + e.toString());
     }
     return aircraftListModel;
+  }
+
+  Future<ReservationModel?> getReservationData(
+      context, int page, int length) async {
+    ReservationModel? reservation;
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'accept': '*/*',
+      'authorization': "$accessToken"
+    };
+    final Map<String, dynamic> requestBody = {
+      "AircraftId": 0,
+      "CompanyId": compamyId,
+      "Length": length,
+      "OrderType": "desc",
+      "ReservationType": 0,
+      "SearchText": "",
+      "SortOrderColumn": "StartDateTime",
+      "Start": page,
+      "UserId": userId
+    };
+    final String jsonBody = jsonEncode(requestBody);
+    try {
+      final response = await http.post(
+        Uri.parse(
+            'https://fly-manager-dev-api.azurewebsites.net/api/Reservation/list'),
+        headers: headers,
+        body: jsonBody,
+      );
+      if (response.statusCode == 200) {
+        final item = json.decode(response.body);
+        debugPrint(item.toString());
+        return ReservationModel.fromJson(
+            item); // Mapping json response to our data model
+      } else {
+        debugPrint('Error occurred: ${response.statusCode} ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Error Occurred' + e.toString());
+    }
+    return reservation;
+  }
+
+  Future<ReservationModel?> getRecentFlightData(context) async {
+    ReservationModel? reservation;
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'accept': '*/*',
+      'authorization': "$accessToken"
+    };
+    final Map<String, dynamic> requestBody = {
+      "AircraftId": 0,
+      "CompanyId": compamyId,
+      "Length": 40,
+      "OrderType": "desc",
+      "ReservationType": 4,
+      "SearchText": "",
+      "SortOrderColumn": "StartDateTime",
+      "Start": 1,
+      "UserId": userId
+    };
+    final String jsonBody = jsonEncode(requestBody);
+    try {
+      final response = await http.post(
+        Uri.parse(
+            'https://fly-manager-dev-api.azurewebsites.net/api/Reservation/list'),
+        headers: headers,
+        body: jsonBody,
+      );
+      if (response.statusCode == 200) {
+        final item = json.decode(response.body);
+        debugPrint(item.toString());
+        return ReservationModel.fromJson(item);
+      } else {
+        debugPrint('Error occurred: ${response.statusCode} ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Error Occurred' + e.toString());
+    }
+    return reservation;
   }
 }

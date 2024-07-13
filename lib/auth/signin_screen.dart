@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../bottombar/bottombar_page.dart';
 import '../models/login_model.dart';
 import '../services/api_service.dart';
 
@@ -69,7 +70,7 @@ class _SignInState extends State<SignIn> {
     );
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const AirCraftList()),
+      MaterialPageRoute(builder: (context) => const MainPage()),
     );
   }
 
