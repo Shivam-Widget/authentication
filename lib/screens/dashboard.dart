@@ -109,7 +109,7 @@ class _DashboardState extends State<Dashboard> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(15.0),
           child: Column(
             children: [
               SingleChildScrollView(
@@ -121,7 +121,7 @@ class _DashboardState extends State<Dashboard> {
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         shrinkWrap: true,
-                        physics: ScrollPhysics(),
+                        physics: const ScrollPhysics(),
                         itemCount: infoList.length,
                         itemBuilder: (ctx, i) {
                           return Row(
@@ -130,34 +130,35 @@ class _DashboardState extends State<Dashboard> {
                                 height: 80,
                                 width: 200,
                                 decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    border: Border.all(color: Colors.grey)),
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(color: Colors.grey),
+                                ),
                                 child: Column(
                                   children: [
                                     Container(
                                       width: 200,
                                       height: 3,
                                       decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.only(
+                                        borderRadius: const BorderRadius.only(
                                           topRight: Radius.circular(5),
                                           topLeft: Radius.circular(5),
                                         ),
                                         color: infoList[i]['color'],
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 15,
                                     ),
                                     Text(
                                       '${infoList[i]['title']}',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           color: Colors.black,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16),
                                     ),
                                     Text(
                                       '${infoList[i]['num']}',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           color: Colors.blue,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16),
@@ -165,7 +166,7 @@ class _DashboardState extends State<Dashboard> {
                                   ],
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 10,
                               ),
                             ],
@@ -176,10 +177,10 @@ class _DashboardState extends State<Dashboard> {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 15,
               ),
-              Row(
+              const Row(
                 children: [
                   Text(
                     'Upcoming reservation',
@@ -198,7 +199,7 @@ class _DashboardState extends State<Dashboard> {
                   )
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 15,
               ),
               Container(
@@ -219,8 +220,8 @@ class _DashboardState extends State<Dashboard> {
                             children: [
                               Text(
                                 'Charter Flight',
-                                style: TextStyle(
-                                    color: Colors.grey, fontSize: 12),
+                                style:
+                                    TextStyle(color: Colors.grey, fontSize: 12),
                               ),
                               Text(
                                 'N311CM',
@@ -280,13 +281,13 @@ class _DashboardState extends State<Dashboard> {
                             children: [
                               Text(
                                 'Aug 13, 2025',
-                                style: TextStyle(
-                                    color: Colors.grey, fontSize: 14),
+                                style:
+                                    TextStyle(color: Colors.grey, fontSize: 14),
                               ),
                               Text(
                                 '03:18 PM',
-                                style: TextStyle(
-                                    color: Colors.grey, fontSize: 14),
+                                style:
+                                    TextStyle(color: Colors.grey, fontSize: 14),
                               ),
                             ],
                           ),
@@ -295,13 +296,13 @@ class _DashboardState extends State<Dashboard> {
                             children: [
                               Text(
                                 'Aug 13, 2025',
-                                style: TextStyle(
-                                    color: Colors.grey, fontSize: 14),
+                                style:
+                                    TextStyle(color: Colors.grey, fontSize: 14),
                               ),
                               Text(
                                 '07:01 PM',
-                                style: TextStyle(
-                                    color: Colors.grey, fontSize: 14),
+                                style:
+                                    TextStyle(color: Colors.grey, fontSize: 14),
                               ),
                             ],
                           ),
@@ -314,9 +315,6 @@ class _DashboardState extends State<Dashboard> {
               const SizedBox(
                 height: 15,
               ),
-
-
-
               const Row(
                 children: [
                   Text(
@@ -339,28 +337,80 @@ class _DashboardState extends State<Dashboard> {
               const SizedBox(
                 height: 15,
               ),
-
-
-
-
-
-              Row(
-                children: [
-                  Container(
-                    height: 100,
-                    width: 360,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(5),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    SizedBox(
+                      height: 100,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        physics: const ScrollPhysics(),
+                        itemCount: 5,
+                        itemBuilder: (ctx, i) {
+                          return Row(
+                            children: [
+                              Container(
+                                height: 80,
+                                width: 360,
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.grey),
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.picture_as_pdf_outlined,
+                                        color: Colors.lightBlue,
+                                        size: 65,
+                                      ),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'ICON A5 POH Revision 3',
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w600),
+                                          ),
+                                          Text(
+                                            'N/A',
+                                            style: TextStyle(
+                                                color: Colors.grey,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 12),
+                                          ),
+                                          Text(
+                                            'Jackson Backer',
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 12),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 15,
+                              ),
+                            ],
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-
-
-
-
-
               const SizedBox(
                 height: 15,
               ),
@@ -385,6 +435,154 @@ class _DashboardState extends State<Dashboard> {
               ),
               const SizedBox(
                 height: 15,
+              ),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    SizedBox(
+                      height: 155,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        physics: const ScrollPhysics(),
+                        itemCount: 4,
+                        itemBuilder: (ctx, i) {
+                          return Row(
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width / 1.2,
+                                height: 152,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(color: Colors.grey),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        children: [
+                                          const Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Charter Flight',
+                                                style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 12),
+                                              ),
+                                              Text(
+                                                'N311CM',
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ],
+                                          ),
+                                          const Spacer(),
+                                          Container(
+                                            height: 30,
+                                            width: 100,
+                                            decoration: BoxDecoration(
+                                              color: Colors.purple
+                                                  .withOpacity(0.2),
+                                              borderRadius:
+                                                  BorderRadius.circular(3),
+                                            ),
+                                            child: const Center(
+                                              child: Text(
+                                                'CheckedIn',
+                                                style: TextStyle(
+                                                    color: Colors.purple),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        children: [
+                                          const Text(
+                                            'HFC',
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          const Spacer(),
+                                          Image.asset(
+                                            'assets/images/aircratimages/ic_aircraftline.png',
+                                            scale: 3,
+                                          ),
+                                          const Spacer(),
+                                          const Text(
+                                            'FKK',
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Row(
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Aug 13, 2025',
+                                                style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 14),
+                                              ),
+                                              Text(
+                                                '03:18 PM',
+                                                style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 14),
+                                              ),
+                                            ],
+                                          ),
+                                          Spacer(),
+                                          Column(
+                                            children: [
+                                              Text(
+                                                'Aug 13, 2025',
+                                                style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 14),
+                                              ),
+                                              Text(
+                                                '07:01 PM',
+                                                style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 14),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 15,
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(
                 height: 15,

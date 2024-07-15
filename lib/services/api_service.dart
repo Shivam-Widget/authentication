@@ -231,7 +231,7 @@ class ApiService {
         return null;
       }
     } catch (e) {
-      print('Error Occurred' + e.toString());
+      debugPrint('Error Occurred' + e.toString());
     }
     return reservation;
   }
