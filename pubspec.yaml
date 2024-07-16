@@ -41,6 +41,9 @@ dependencies:
   provider: any
   intl: any
   cached_network_image: any
+  scrollable_table_view: any
+  lazy_data_table: any
+
 
 dev_dependencies:
   flutter_test:
