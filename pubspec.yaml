@@ -43,6 +43,8 @@ dependencies:
   cached_network_image: any
   scrollable_table_view: any
   lazy_data_table: any
+  contained_tab_bar_view: any
+  multiselect: any
 
 
 dev_dependencies:
