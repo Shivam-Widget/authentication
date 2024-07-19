@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:authentication/models/reservation_model.dart';
+import 'package:authentication/models/schedule_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/aircrat_model.dart';
 import '../models/forgotpassword_model.dart';
@@ -234,5 +236,41 @@ class ApiService {
       debugPrint('Error Occurred' + e.toString());
     }
     return reservation;
+  }
+
+
+  Future<ScheduleModel?> getScheduleFlightData(context) async {
+    ScheduleModel? schedule;
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json-patch+json',
+      'accept': '*/*',
+      'authorization': "$accessToken"
+    };
+    final Map<String, dynamic> requestBody = {
+      "companyId": 0,
+      "endTime": "2024-07-19T18:30:00", // 2002-02-27T19:00:00Z
+      "isMyFlightOnly": true,
+      "startTime": "2024-07-18T18:30:00"
+    };
+    final String jsonBody = jsonEncode(requestBody);
+    try {
+      final response = await http.post(
+        Uri.parse(
+            'https://fly-manager-dev-api.azurewebsites.net/api/AircraftScheduler/list'),
+        headers: headers,
+        body: jsonBody,
+      );
+      if (response.statusCode == 200) {
+        final item = json.decode(response.body);
+        debugPrint(item.toString());
+        return ScheduleModel.fromJson(item);
+      } else {
+        debugPrint('Error occurred: ${response.statusCode} ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('Error Occurred: $e');
+    }
+    return schedule;
   }
 }

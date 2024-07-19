@@ -1,6 +1,13 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+import 'package:authentication/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:multiselect/multiselect.dart';
+import 'package:provider/provider.dart';
+
+import '../provider/aircraft_provider.dart';
+import '../sharedprefrences/SharedPrefs.dart';
 
 class SchedulesScreen extends StatefulWidget {
   const SchedulesScreen({super.key});
@@ -9,9 +16,17 @@ class SchedulesScreen extends StatefulWidget {
   State<SchedulesScreen> createState() => _SchedulesScreenState();
 }
 
-class _SchedulesScreenState extends State<SchedulesScreen>
-    with SingleTickerProviderStateMixin {
+class _SchedulesScreenState extends State<SchedulesScreen> {
   DateTime selectedDate = DateTime.now();
+  static String? accessToken = SharedPreferencesHelper.accessToken;
+
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<AircraftProvider>(context, listen: false)
+        .getAircraftPostData(context);
+    ApiService().getScheduleFlightData(context);
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -105,12 +120,41 @@ class _SchedulesScreenState extends State<SchedulesScreen>
     },
   ];
 
+  Future<List> _fetchData() async {
+    final api1Response = await ApiService().getAircraftlistData(context);
+    final api2Response = await ApiService().getScheduleFlightData(context);
+
+    final dataList = [api1Response, api2Response];
+    return dataList;
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
     String formattedDate = DateFormat('MMM d, yyyy').format(selectedDate);
+    final postModel = Provider.of<AircraftProvider>(context);
+    final scheduleData = ApiService().getScheduleFlightData(context);
+    debugPrint("----Token----> $accessToken");
 
-    return Scaffold(
+    return postModel.loading
+        ? Center(
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          const CircularProgressIndicator(
+            color: Colors.blue,
+            strokeWidth: 3,
+            strokeCap: StrokeCap.butt,
+          ),
+          Image.asset(
+            'assets/images/upflyte_launcher.png',
+            scale: 2,
+          ),
+        ],
+      ),
+    )
+        : Scaffold(
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: const Color(0xFF1E374F),
@@ -377,20 +421,39 @@ class _SchedulesScreenState extends State<SchedulesScreen>
                 ),
               ),
             ),
-            
-            
+
+
+            // child: CustomDataTable(
+            //   fixedCornerCell: '',
+            //   borderColor: Colors.grey.shade300,
+            //   rowsCells: _rowsCells, // api
+            //   fixedColCells: _fixedColCells, // api
+            //   fixedRowCells: _fixedRowCells,
+            // ),
+
             SizedBox(
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
-              child: CustomDataTable(
-                fixedCornerCell: '',
-                borderColor: Colors.grey.shade300,
-                rowsCells: _rowsCells,
-                fixedColCells: _fixedColCells,
-                fixedRowCells: _fixedRowCells,
-              ),
+              child: ListView.builder(
+                    itemExtent: 100,
+                    shrinkWrap: true,
+                    physics: const ScrollPhysics(),
+                    scrollDirection: Axis.vertical,
+                    itemCount: postModel.aircraftListModel.data?.length ?? 0,
+                    itemBuilder: (ctx, i) {
+                      return CustomDataTable(
+                        fixedCornerCell: '',
+                        borderColor: Colors.grey.shade300,
+                        rowsCells: _rowsCells, // api
+                        fixedColCells: [postModel.aircraftListModel.data?[i]
+                            .tailNo ?? ''
+                        ],
+                        fixedRowCells: _fixedRowCells,
+                      );
+                    },
+                  ),
             ),
-          ],
+      ],
         ),
       ),
     );
@@ -416,24 +479,8 @@ final _rowsCells = [
   ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
 
 ];
-final _fixedColCells = [
-  "NC76510",
-  "NC32166",
-  "N9161T",
-  "N811SB",
-  "N748D",
-  "N722MA",
-  "N66AR",
-  "N65GY",
-  "N5314S",
-  "N497PG",
-  "N49456",
-  "N311CM",
-  "N268BA",
-  "N265SB",
-  "N16623",
-  "N12H4",
-];
+
+
 final _fixedRowCells = [
   '12 AM',
   '1 AM',
@@ -459,8 +506,6 @@ final _fixedRowCells = [
   "9 PM",
   "10 PM",
   "11 PM",
-
-
 ];
 
 class CustomDataTable<T> extends StatefulWidget {
@@ -534,7 +579,7 @@ class CustomDataTableState<T> extends State<CustomDataTable<T>> {
         columns: [
           DataColumn(
             label:
-                _buildChild(widget.fixedColWidth, widget.fixedColCells.first),
+             _buildChild(widget.fixedColWidth, widget.fixedColCells.first),
           ),
         ],
         rows: widget.fixedColCells
@@ -566,6 +611,7 @@ class CustomDataTableState<T> extends State<CustomDataTable<T>> {
         rows: const [],
       );
 
+
   Widget _buildSubTable() => Material(
         color: Colors.white,
         child: DataTable(
@@ -590,7 +636,7 @@ class CustomDataTableState<T> extends State<CustomDataTable<T>> {
                             _buildChild(widget.cellWidth, c),
                           ),
                         )
-                        .toList()),
+                        .toList(),),
               )
               .toList(),
         ),
@@ -606,7 +652,7 @@ class CustomDataTableState<T> extends State<CustomDataTable<T>> {
           DataColumn(
             label: _buildChild(
               widget.fixedColWidth,
-              widget.fixedCornerCell,
+              widget.fixedCornerCell!,
             ),
           ),
         ],
@@ -627,6 +673,7 @@ class CustomDataTableState<T> extends State<CustomDataTable<T>> {
       },
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -656,7 +703,7 @@ class CustomDataTableState<T> extends State<CustomDataTable<T>> {
                   SingleChildScrollView(
                     controller: _columnController,
                     scrollDirection: Axis.vertical,
-                    physics: const NeverScrollableScrollPhysics(),
+                    physics: const ScrollPhysics(),
                     child: _buildFixedCol(),
                   ),
                   Flexible(
@@ -679,5 +726,7 @@ class CustomDataTableState<T> extends State<CustomDataTable<T>> {
         ),
       ),
     );
+
+
   }
 }
