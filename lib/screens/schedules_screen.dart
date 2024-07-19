@@ -19,6 +19,7 @@ class SchedulesScreen extends StatefulWidget {
 class _SchedulesScreenState extends State<SchedulesScreen> {
   DateTime selectedDate = DateTime.now();
   static String? accessToken = SharedPreferencesHelper.accessToken;
+  final ApiService apiService = ApiService();
 
   @override
   void initState() {
@@ -120,13 +121,30 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
     },
   ];
 
-  Future<List> _fetchData() async {
-    final api1Response = await ApiService().getAircraftlistData(context);
-    final api2Response = await ApiService().getScheduleFlightData(context);
 
-    final dataList = [api1Response, api2Response];
-    return dataList;
-  }
+
+
+  //
+  // List<dynamic> combinedData = [];
+  // bool isLoading = true;
+  //
+  //
+  // Future<void> fetchData() async {
+  //   final response1 = await http.get(Uri.parse('https://fly-manager-dev-api.azurewebsites.net/api/Aircraft/list'));
+  //   final response2 = await http.get(Uri.parse('https://fly-manager-dev-api.azurewebsites.net/api/AircraftScheduler/list'));
+  //
+  //   if (response1.statusCode == 200 && response2.statusCode == 200) {
+  //     final data1 = json.decode(response1.body);
+  //     final data2 = json.decode(response2.body);
+  //
+  //     setState(() {
+  //       combinedData = [...data1, ...data2]; // Combining the data
+  //       isLoading = false;
+  //     });
+  //   } else {
+  //     throw Exception('Failed to load data');
+  //   }
+  // }
 
 
 
@@ -453,7 +471,7 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
                     },
                   ),
             ),
-      ],
+          ],
         ),
       ),
     );
