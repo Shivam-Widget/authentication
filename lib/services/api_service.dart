@@ -248,9 +248,9 @@ class ApiService {
     };
     final Map<String, dynamic> requestBody = {
       "companyId": 0,
-      "endTime": "2024-07-19T18:30:00", // 2002-02-27T19:00:00Z
+      "endTime": "2024-07-30T18:30:00",
       "isMyFlightOnly": true,
-      "startTime": "2024-07-18T18:30:00"
+      "startTime": "2024-07-1T18:30:00"
     };
     final String jsonBody = jsonEncode(requestBody);
     try {

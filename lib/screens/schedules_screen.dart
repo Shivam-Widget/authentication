@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:authentication/provider/schedule_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:authentication/services/api_service.dart';
 import 'package:flutter/material.dart';
@@ -20,13 +21,46 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
   DateTime selectedDate = DateTime.now();
   static String? accessToken = SharedPreferencesHelper.accessToken;
   final ApiService apiService = ApiService();
+  List _fixedColCells = [];
+  List _rowCells = [];
+
+  Future<void> _fetchScheduleData() async {
+    try {
+      await Provider.of<ScheduleProvider>(context, listen: false)
+          .getSchedulePostData(context);
+      final postMdl = Provider.of<ScheduleProvider>(context, listen: false);
+      setState(() {
+        _rowCells = postMdl.scheduleModel.data!
+            .map((schedule) => schedule.companyId)
+            .toList();
+      });
+    } catch (error) {
+      debugPrint("Error fetching schedule data: $error");
+    }
+  }
+
+  Future<void> _fetchAircraftData() async {
+    try {
+      await Provider.of<AircraftProvider>(context, listen: false)
+          .getAircraftPostData(context);
+      final postMdl = Provider.of<AircraftProvider>(context, listen: false);
+      setState(() {
+        _fixedColCells = postMdl.aircraftListModel.data!
+            .map((aircraft) => aircraft.tailNo)
+            .toList();
+      });
+    } catch (error) {
+      debugPrint("Error fetching aircraft data: $error");
+    }
+  }
 
   @override
   void initState() {
+    setState(() {
+      _fetchAircraftData();
+      _fetchScheduleData();
+    });
     super.initState();
-    Provider.of<AircraftProvider>(context, listen: false)
-        .getAircraftPostData(context);
-    ApiService().getScheduleFlightData(context);
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -121,58 +155,13 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
     },
   ];
 
-
-
-
-  //
-  // List<dynamic> combinedData = [];
-  // bool isLoading = true;
-  //
-  //
-  // Future<void> fetchData() async {
-  //   final response1 = await http.get(Uri.parse('https://fly-manager-dev-api.azurewebsites.net/api/Aircraft/list'));
-  //   final response2 = await http.get(Uri.parse('https://fly-manager-dev-api.azurewebsites.net/api/AircraftScheduler/list'));
-  //
-  //   if (response1.statusCode == 200 && response2.statusCode == 200) {
-  //     final data1 = json.decode(response1.body);
-  //     final data2 = json.decode(response2.body);
-  //
-  //     setState(() {
-  //       combinedData = [...data1, ...data2]; // Combining the data
-  //       isLoading = false;
-  //     });
-  //   } else {
-  //     throw Exception('Failed to load data');
-  //   }
-  // }
-
-
-
   @override
   Widget build(BuildContext context) {
     String formattedDate = DateFormat('MMM d, yyyy').format(selectedDate);
     final postModel = Provider.of<AircraftProvider>(context);
-    final scheduleData = ApiService().getScheduleFlightData(context);
     debugPrint("----Token----> $accessToken");
 
-    return postModel.loading
-        ? Center(
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          const CircularProgressIndicator(
-            color: Colors.blue,
-            strokeWidth: 3,
-            strokeCap: StrokeCap.butt,
-          ),
-          Image.asset(
-            'assets/images/upflyte_launcher.png',
-            scale: 2,
-          ),
-        ],
-      ),
-    )
-        : Scaffold(
+    return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: const Color(0xFF1E374F),
@@ -193,311 +182,306 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
         ],
         automaticallyImplyLeading: false,
       ),
-      body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Column(
-          children: [
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: 45,
-              color: Colors.grey.shade400,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(3),
+      body: postModel.loading
+          ? Center(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  const CircularProgressIndicator(
+                    color: Colors.blue,
+                    strokeWidth: 3,
+                    strokeCap: StrokeCap.butt,
                   ),
-                  child: GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return SingleChildScrollView(
-                            scrollDirection: Axis.vertical,
-                            child: Padding(
-                              padding: const EdgeInsets.all(15),
-                              child: Container(
-                                height: 850,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(5)
-                                ),
-                                child: AlertDialog(
-                                  backgroundColor: Colors.transparent,
-                                  title: const Text(
-                                    'All Aircraft',
-                                    style: TextStyle(fontSize: 18),
-                                  ),
-                                  actions: [
-                                    TextField(
-                                      decoration: InputDecoration(
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(3),
+                  Image.asset(
+                    'assets/images/upflyte_launcher.png',
+                    scale: 2,
+                  ),
+                ],
+              ),
+            )
+          : SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Column(
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 45,
+                    color: Colors.grey.shade400,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 5, vertical: 5),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                        child: GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return SingleChildScrollView(
+                                  scrollDirection: Axis.vertical,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(15),
+                                    child: Container(
+                                      height: 850,
+                                      decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
+                                      child: AlertDialog(
+                                        backgroundColor: Colors.transparent,
+                                        title: const Text(
+                                          'All Aircraft',
+                                          style: TextStyle(fontSize: 18),
                                         ),
-                                        hintText: 'Search Aircraft',
-                                        contentPadding: const EdgeInsets.fromLTRB(
-                                            20.0, 10.0, 20.0, 10.0),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: MediaQuery.of(context).size.width,
-                                      height: 600,
-                                      child: SingleChildScrollView(
-                                        scrollDirection: Axis.vertical,
-                                        child: Column(
-                                          children: [
-                                            SizedBox(
-                                              height: MediaQuery.of(context)
-                                                  .size
-                                                  .height,
-                                              child: ListView.builder(
-                                                shrinkWrap: true,
-                                                physics: const ScrollPhysics(),
-                                                itemCount: aircraftList.length,
-                                                scrollDirection: Axis.vertical,
-                                                itemBuilder: (ctx, i) {
-                                                  return Column(
-                                                    children: [
-                                                      CheckboxListTile(
-                                                        value: aircraftList[i]
-                                                            ['isChecked'],
-                                                        onChanged: (value) {
-                                                          setState(() {
-                                                            aircraftList[i]
-                                                                    ['isChecked'] =
-                                                                value!;
-                                                          },
-                                                          );
-                                                        },
-                                                        title: Text(
-                                                            '${aircraftList[i]['name']}'),
-                                                      ),
-                                                      const Divider(),
-                                                    ],
-                                                  );
-                                                },
+                                        actions: [
+                                          TextField(
+                                            decoration: InputDecoration(
+                                              border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(3),
+                                              ),
+                                              hintText: 'Search Aircraft',
+                                              contentPadding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20.0, 10.0, 20.0, 10.0),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            height: 600,
+                                            child: SingleChildScrollView(
+                                              scrollDirection: Axis.vertical,
+                                              child: Column(
+                                                children: [
+                                                  SizedBox(
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                            .size
+                                                            .height,
+                                                    child: ListView.builder(
+                                                      shrinkWrap: true,
+                                                      physics:
+                                                          const ScrollPhysics(),
+                                                      itemCount:
+                                                          aircraftList.length,
+                                                      scrollDirection:
+                                                          Axis.vertical,
+                                                      itemBuilder: (ctx, i) {
+                                                        return Column(
+                                                          children: [
+                                                            CheckboxListTile(
+                                                              value: aircraftList[
+                                                                      i]
+                                                                  ['isChecked'],
+                                                              onChanged:
+                                                                  (value) {
+                                                                setState(
+                                                                  () {
+                                                                    aircraftList[i]
+                                                                            [
+                                                                            'isChecked'] =
+                                                                        value!;
+                                                                  },
+                                                                );
+                                                              },
+                                                              title: Text(
+                                                                  '${aircraftList[i]['name']}'),
+                                                            ),
+                                                            const Divider(),
+                                                          ],
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: MediaQuery.of(context).size.width,
-                                      height: 50,
-                                      color: Colors.white,
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () {
-                                              setState(() {
-                                                Navigator.pop(context);
-                                              });
-                                            },
-                                            child: const Text('CLEAR & CLOSE'),
                                           ),
-                                          const SizedBox(
-                                            width: 15,
-                                          ),
-                                          GestureDetector(
-                                              onTap: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child: const Text('OK')),
-                                          const SizedBox(
-                                            width: 10,
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            height: 50,
+                                            color: Colors.white,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      Navigator.pop(context);
+                                                    });
+                                                  },
+                                                  child: const Text(
+                                                      'CLEAR & CLOSE'),
+                                                ),
+                                                const SizedBox(
+                                                  width: 15,
+                                                ),
+                                                GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: const Text('OK')),
+                                                const SizedBox(
+                                                  width: 10,
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                          child: const Row(
+                            children: [
+                              SizedBox(
+                                width: 10,
                               ),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                    child: const Row(
+                              Text('All Aircraft'),
+                              Spacer(),
+                              Icon(
+                                Icons.arrow_drop_down_sharp,
+                                color: Colors.grey,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 50,
+                    color: Colors.white,
+                    child: Row(
                       children: [
-                        SizedBox(
-                          width: 10,
+                        Container(
+                          height: 50,
+                          width: MediaQuery.of(context).size.width / 2.1,
+                          decoration: const BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: Colors.blue, width: 3),
+                            ),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'Aircraft',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
                         ),
-                        Text('All Aircraft'),
-                        Spacer(),
-                        Icon(
-                          Icons.arrow_drop_down_sharp,
-                          color: Colors.grey,
-                        ),
-                        SizedBox(
-                          width: 10,
+                        const Spacer(),
+                        Container(
+                          height: 50,
+                          width: MediaQuery.of(context).size.width / 2.1,
+                          decoration: const BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: Colors.blue, width: 3),
+                            ),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'Pilot',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ),
-              ),
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: 50,
-              color: Colors.white,
-              child: Row(
-                children: [
                   Container(
+                    width: MediaQuery.of(context).size.width,
                     height: 50,
-                    width: MediaQuery.of(context).size.width / 2.1,
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(color: Colors.blue, width: 3),
-                      ),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'Aircraft',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                    color: Colors.white,
+                    child: Container(
+                      margin: const EdgeInsets.only(top: 5, bottom: 5),
+                      width: MediaQuery.of(context).size.width,
+                      height: 40,
+                      color: const Color(0xFFEBF0FF),
+                      child: Row(
+                        children: [
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          GestureDetector(
+                            onTap: _incrementCounter,
+                            child: const Icon(
+                              Icons.arrow_back_ios,
+                              size: 16,
+                            ),
+                          ),
+                          const Spacer(),
+                          GestureDetector(
+                            onTap: () {
+                              _selectDate(context);
+                            },
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.calendar_today_outlined,
+                                  size: 18,
+                                ),
+                                const SizedBox(
+                                  width: 6,
+                                ),
+                                Text(
+                                  formattedDate,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Spacer(),
+                          GestureDetector(
+                            onTap: _incrementCounter,
+                            child: const Icon(
+                              Icons.arrow_forward_ios,
+                              size: 16,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  const Spacer(),
-                  Container(
-                    height: 50,
-                    width: MediaQuery.of(context).size.width / 2.1,
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(color: Colors.blue, width: 3),
-                      ),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'Pilot',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height,
+                    width: MediaQuery.of(context).size.width,
+                    child: CustomDataTable(
+                      fixedCornerCell: '',
+                      borderColor: Colors.grey.shade300,
+                      // rowsCells: [_rowCells], // API
+                      // fixedColCells: [_fixedColCells], // API
+                      rowsCells: [_fixedColCells],
+                      fixedColCells: [_rowCells],
+                      fixedRowCells: _fixedRowCells,
                     ),
                   ),
                 ],
               ),
             ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: 50,
-              color: Colors.white,
-              child: Container(
-                margin: const EdgeInsets.only(top: 5, bottom: 5),
-                width: MediaQuery.of(context).size.width,
-                height: 40,
-                color: const Color(0xFFEBF0FF),
-                child: Row(
-                  children: [
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    GestureDetector(
-                      onTap: _incrementCounter,
-                      child: const Icon(
-                        Icons.arrow_back_ios,
-                        size: 16,
-                      ),
-                    ),
-                    const Spacer(),
-                    GestureDetector(
-                      onTap: () {
-                        _selectDate(context);
-                      },
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.calendar_today_outlined,
-                            size: 18,
-                          ),
-                          const SizedBox(
-                            width: 6,
-                          ),
-                          Text(
-                            formattedDate,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Spacer(),
-                    GestureDetector(
-                      onTap: _incrementCounter,
-                      child: const Icon(
-                        Icons.arrow_forward_ios,
-                        size: 16,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-
-            // child: CustomDataTable(
-            //   fixedCornerCell: '',
-            //   borderColor: Colors.grey.shade300,
-            //   rowsCells: _rowsCells, // api
-            //   fixedColCells: _fixedColCells, // api
-            //   fixedRowCells: _fixedRowCells,
-            // ),
-
-            SizedBox(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: ListView.builder(
-                    itemExtent: 100,
-                    shrinkWrap: true,
-                    physics: const ScrollPhysics(),
-                    scrollDirection: Axis.vertical,
-                    itemCount: postModel.aircraftListModel.data?.length ?? 0,
-                    itemBuilder: (ctx, i) {
-                      return CustomDataTable(
-                        fixedCornerCell: '',
-                        borderColor: Colors.grey.shade300,
-                        rowsCells: _rowsCells, // api
-                        fixedColCells: [postModel.aircraftListModel.data?[i]
-                            .tailNo ?? ''
-                        ],
-                        fixedRowCells: _fixedRowCells,
-                      );
-                    },
-                  ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
-
-final _rowsCells = [
-  ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-  ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-  ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-  ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-  ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-  ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-  ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-  ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-  ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-  ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-  ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-  ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-  ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-  ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-  ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-  ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-
-];
-
 
 final _fixedRowCells = [
   '12 AM',
@@ -588,47 +572,52 @@ class CustomDataTableState<T> extends State<CustomDataTable<T>> {
     );
   }
 
-  Widget _buildFixedCol() => DataTable(
-        border: _buildBorder(right: true),
-        horizontalMargin: widget.cellMargin,
-        columnSpacing: widget.cellSpacing,
-        headingRowHeight: widget.cellHeight,
-        dataRowHeight: widget.cellHeight,
-        columns: [
-          DataColumn(
-            label:
-             _buildChild(widget.fixedColWidth, widget.fixedColCells.first),
-          ),
-        ],
-        rows: widget.fixedColCells
-            .map(
-              (c) => DataRow(
-                cells: [
-                  DataCell(
-                    _buildChild(widget.fixedColWidth, c),
-                  ),
-                ],
-              ),
-            )
-            .toList(),
+  Widget _buildFixedCol() => Material(
+        color: Colors.white,
+        child: DataTable(
+          border: _buildBorder(right: true),
+          horizontalMargin: widget.cellMargin,
+          columnSpacing: widget.cellSpacing,
+          headingRowHeight: widget.cellHeight,
+          dataRowHeight: widget.cellHeight,
+          columns: [
+            DataColumn(
+              label:
+                  _buildChild(widget.fixedColWidth, widget.fixedColCells.first),
+            ),
+          ],
+          rows: widget.fixedColCells
+              .map(
+                (c) => DataRow(
+                  cells: [
+                    DataCell(
+                      _buildChild(widget.fixedColWidth, c),
+                    ),
+                  ],
+                ),
+              )
+              .toList(),
+        ),
       );
 
-  Widget _buildFixedRow() => DataTable(
-        border: _buildBorder(verticalInside: true, bottom: true),
-        horizontalMargin: widget.cellMargin,
-        columnSpacing: widget.cellSpacing,
-        headingRowHeight: widget.cellHeight,
-        dataRowHeight: widget.cellHeight,
-        columns: widget.fixedRowCells
-            .map(
-              (c) => DataColumn(
-                label: _buildChild(widget.cellWidth, c),
-              ),
-            )
-            .toList(),
-        rows: const [],
+  Widget _buildFixedRow() => Material(
+        color: Colors.white,
+        child: DataTable(
+          border: _buildBorder(verticalInside: true, bottom: true),
+          horizontalMargin: widget.cellMargin,
+          columnSpacing: widget.cellSpacing,
+          headingRowHeight: widget.cellHeight,
+          dataRowHeight: widget.cellHeight,
+          columns: widget.fixedRowCells
+              .map(
+                (c) => DataColumn(
+                  label: _buildChild(widget.cellWidth, c),
+                ),
+              )
+              .toList(),
+          rows: const [],
+        ),
       );
-
 
   Widget _buildSubTable() => Material(
         color: Colors.white,
@@ -648,33 +637,37 @@ class CustomDataTableState<T> extends State<CustomDataTable<T>> {
           rows: widget.rowsCells
               .map(
                 (row) => DataRow(
-                    cells: row
-                        .map(
-                          (c) => DataCell(
-                            _buildChild(widget.cellWidth, c),
-                          ),
-                        )
-                        .toList(),),
+                  cells: row
+                      .map(
+                        (c) => DataCell(
+                          _buildChild(widget.cellWidth, c),
+                        ),
+                      )
+                      .toList(),
+                ),
               )
               .toList(),
         ),
       );
 
-  Widget _buildCornerCell() => DataTable(
-        border: _buildBorder(bottom: true, right: true),
-        horizontalMargin: widget.cellMargin,
-        columnSpacing: widget.cellSpacing,
-        headingRowHeight: widget.cellHeight,
-        dataRowHeight: widget.cellHeight,
-        columns: [
-          DataColumn(
-            label: _buildChild(
-              widget.fixedColWidth,
-              widget.fixedCornerCell!,
+  Widget _buildCornerCell() => Material(
+        color: Colors.white,
+        child: DataTable(
+          border: _buildBorder(bottom: true, right: true),
+          horizontalMargin: widget.cellMargin,
+          columnSpacing: widget.cellSpacing,
+          headingRowHeight: widget.cellHeight,
+          dataRowHeight: widget.cellHeight,
+          columns: [
+            DataColumn(
+              label: _buildChild(
+                widget.fixedColWidth,
+                widget.fixedCornerCell!,
+              ),
             ),
-          ),
-        ],
-        rows: const [],
+          ],
+          rows: const [],
+        ),
       );
 
   @override
@@ -691,7 +684,6 @@ class CustomDataTableState<T> extends State<CustomDataTable<T>> {
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -744,7 +736,5 @@ class CustomDataTableState<T> extends State<CustomDataTable<T>> {
         ),
       ),
     );
-
-
   }
 }
