@@ -273,4 +273,31 @@ class ApiService {
     }
     return schedule;
   }
+
+
+  Future<ScheduleModel?> getDocumentType(context) async {
+    ScheduleModel? schedule;
+    final Map<String, String> headers = {
+      'accept': '*/*',
+      'authorization': "$accessToken"
+    };
+    try {
+      final response = await http.get(
+        Uri.parse(
+            'https://fly-manager-dev-api.azurewebsites.net/api/Document/getDetails?id=00000000-0000-0000-0000-000000000000'),
+        headers: headers,
+      );
+      if (response.statusCode == 200) {
+        final item = json.decode(response.body);
+        debugPrint(item.toString());
+        return ScheduleModel.fromJson(item);
+      } else {
+        debugPrint('Error occurred: ${response.statusCode} ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('Error Occurred: $e');
+    }
+    return schedule;
+  }
 }

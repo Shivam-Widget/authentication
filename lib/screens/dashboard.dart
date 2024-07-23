@@ -1,3 +1,5 @@
+import 'package:authentication/screens/upload_document.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Dashboard extends StatefulWidget {
@@ -315,7 +317,7 @@ class _DashboardState extends State<Dashboard> {
               const SizedBox(
                 height: 15,
               ),
-              const Row(
+              Row(
                 children: [
                   Text(
                     'Documents',
@@ -325,12 +327,17 @@ class _DashboardState extends State<Dashboard> {
                         fontWeight: FontWeight.bold),
                   ),
                   Spacer(),
-                  Text(
-                    'See All',
-                    style: TextStyle(
-                        color: Colors.blue,
-                        decoration: TextDecoration.underline,
-                        decorationColor: Colors.blue),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const UploadDocument()),);
+                    },
+                    child: Text(
+                      'See All',
+                      style: TextStyle(
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colors.blue),
+                    ),
                   )
                 ],
               ),

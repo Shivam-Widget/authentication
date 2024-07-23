@@ -45,6 +45,9 @@ dependencies:
   lazy_data_table: any
   contained_tab_bar_view: any
   multiselect: any
+  image_picker: any
+  file_picker: any
+  open_file: any
 
 
 dev_dependencies:

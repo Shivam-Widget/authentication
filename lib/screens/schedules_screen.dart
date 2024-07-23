@@ -1,12 +1,8 @@
-import 'dart:convert';
-
 import 'package:authentication/provider/schedule_provider.dart';
-import 'package:http/http.dart' as http;
 import 'package:authentication/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
 import '../provider/aircraft_provider.dart';
 import '../sharedprefrences/SharedPrefs.dart';
 
@@ -31,7 +27,7 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
       final postMdl = Provider.of<ScheduleProvider>(context, listen: false);
       setState(() {
         _rowCells = postMdl.scheduleModel.data!
-            .map((schedule) => schedule.companyId)
+            .map((schedule) => schedule.displayTitle)
             .toList();
       });
     } catch (error) {
@@ -463,6 +459,8 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
                       ),
                     ),
                   ),
+
+
                   SizedBox(
                     height: MediaQuery.of(context).size.height,
                     width: MediaQuery.of(context).size.width,

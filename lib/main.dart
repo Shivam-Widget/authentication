@@ -1,5 +1,6 @@
 import 'package:authentication/onboarding/onboarding_screen.dart';
 import 'package:authentication/provider/aircraft_provider.dart';
+import 'package:authentication/provider/document_provider.dart';
 import 'package:authentication/provider/reservation_provider.dart';
 import 'package:authentication/provider/schedule_provider.dart';
 import 'package:authentication/sharedprefrences/SharedPrefs.dart';
@@ -27,9 +28,12 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider<ScheduleProvider>(
           create: (context) => ScheduleProvider(),
-        )
+        ),
+        ChangeNotifierProvider<DocumentProvider>(
+          create: (context) => DocumentProvider(),
+        ),
       ],
-      child: MaterialApp(
+      child: const MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         home: OnBoardingScreen(),
