@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:authentication/models/reservation_model.dart';
 import 'package:authentication/models/schedule_model.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/aircrat_model.dart';
+import '../models/document_type_model.dart';
 import '../models/forgotpassword_model.dart';
 import '../models/login_model.dart';
 import '../sharedprefrences/SharedPrefs.dart';
@@ -274,8 +276,55 @@ class ApiService {
     return schedule;
   }
 
+  // Future<ScheduleModel?> getDocumentType(context) async {
+  //   ScheduleModel? schedule;
+  //   final Map<String, String> headers = {
+  //     'accept': '*/*',
+  //     'authorization': "$accessToken"
+  //   };
+  //   try {
+  //     final response = await http.get(
+  //       Uri.parse(
+  //           'https://fly-manager-dev-api.azurewebsites.net/api/Document/getDetails?id=00000000-0000-0000-0000-000000000000'),
+  //       headers: headers,
+  //     );
+  //     if (response.statusCode == 200) {
+  //       final item = json.decode(response.body);
+  //       debugPrint(item.toString());
+  //       return ScheduleModel.fromJson(item);
+  //     } else {
+  //       debugPrint('Error occurred: ${response.statusCode} ${response.body}');
+  //       return null;
+  //     }
+  //   } catch (e) {
+  //     debugPrint('Error Occurred: $e');
+  //   }
+  //   return schedule;
+  // }
 
-  Future<ScheduleModel?> getDocumentType(context) async {
+
+  Future<List<DocumentTypeModel>> getDocumentType(context) async {
+    try {
+      final response = await http.get(Uri.parse('https://fly-manager-dev-api.azurewebsites.net/api/Document/getDetails?id=00000000-0000-0000-0000-000000000000'));
+      final body = json.decode(response.body) as List;
+      if (response.statusCode == 200) {
+        return body.map((dynamic json) {
+          final map = json as Map<String, dynamic>;
+          return DocumentTypeModel(
+            data: map['modulesList']['name'],
+          );
+        }).toList();
+      }
+    } on SocketException {
+      await Future.delayed(const Duration(milliseconds: 1800));
+      throw Exception('No Internet Connection');
+    }
+    throw Exception('error fetching data');
+  }
+
+
+
+  Future<ScheduleModel?> getSelectUser(context) async {
     ScheduleModel? schedule;
     final Map<String, String> headers = {
       'accept': '*/*',
@@ -284,7 +333,7 @@ class ApiService {
     try {
       final response = await http.get(
         Uri.parse(
-            'https://fly-manager-dev-api.azurewebsites.net/api/Document/getDetails?id=00000000-0000-0000-0000-000000000000'),
+            'https://fly-manager-dev-api.azurewebsites.net/api/User/listDropdownValuesbyCompanyId?companyId=1'),
         headers: headers,
       );
       if (response.statusCode == 200) {
@@ -300,4 +349,6 @@ class ApiService {
     }
     return schedule;
   }
+
+
 }

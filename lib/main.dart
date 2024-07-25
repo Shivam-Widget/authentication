@@ -3,6 +3,7 @@ import 'package:authentication/provider/aircraft_provider.dart';
 import 'package:authentication/provider/document_provider.dart';
 import 'package:authentication/provider/reservation_provider.dart';
 import 'package:authentication/provider/schedule_provider.dart';
+import 'package:authentication/provider/selectuser_provider.dart';
 import 'package:authentication/sharedprefrences/SharedPrefs.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -31,6 +32,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider<DocumentProvider>(
           create: (context) => DocumentProvider(),
+        ),
+        ChangeNotifierProvider<SelectUserProvider>(
+          create: (context) => SelectUserProvider(),
         ),
       ],
       child: const MaterialApp(

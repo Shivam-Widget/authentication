@@ -206,7 +206,7 @@ class _DashboardState extends State<Dashboard> {
               ),
               Container(
                 width: MediaQuery.of(context).size.width,
-                height: 152,
+                height: 162,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),
                   border: Border.all(color: Colors.grey),
@@ -448,7 +448,7 @@ class _DashboardState extends State<Dashboard> {
                 child: Row(
                   children: [
                     SizedBox(
-                      height: 155,
+                      height: 175,
                       child: ListView.builder(
                         shrinkWrap: true,
                         scrollDirection: Axis.horizontal,
@@ -458,8 +458,8 @@ class _DashboardState extends State<Dashboard> {
                           return Row(
                             children: [
                               Container(
-                                width: MediaQuery.of(context).size.width / 1.2,
-                                height: 152,
+                                width: MediaQuery.of(context).size.width / 1.1,
+                                height: 162,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(5),
                                   border: Border.all(color: Colors.grey),

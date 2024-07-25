@@ -1,7 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:authentication/models/select_user_model.dart';
 import 'package:authentication/provider/document_provider.dart';
+import 'package:authentication/provider/selectuser_provider.dart';
+import 'package:authentication/services/api_service.dart';
+import 'package:authentication/widgets/customdropdownbutton.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -98,38 +102,108 @@ class _UploadDocumentState extends State<UploadDocument> {
   }
 
   static const List<String> list = <String>['One', 'Two', 'Three', 'Four'];
-  String dropdownValue = list.first;
+  String? dropdownValue;
 
-  static List lists = [];
-  String dropdownValues = lists.first;
+  List<String?> lists = <String>[];
+  String? dropdownValues;
 
+  static String? accessToken = SharedPreferencesHelper.accessToken;
 
-  Future<void> _fetchDocType() async {
+  // Future<List<DocumentTypeModel>> getData() async {
+  //   try {
+  //     final res = await http.get(Uri.parse(
+  //         'https://fly-manager-dev-api.azurewebsites.net/api/Document/getDetails?id=00000000-0000-0000-0000-000000000000'));
+  //
+  //     final body = json.decode(res.body) as List;
+  //
+  //     if (res.statusCode == 200) {
+  //       return body.map((e) {
+  //         final map = e as Map<String, dynamic>;
+  //
+  //         return DocumentTypeModel(
+  //           data: map['data']['modulesList']['name'],
+  //         );
+  //       }).toList();
+  //     }
+  //   } catch (e) {
+  //     debugPrint('-------> $e');
+  //   }
+  //   throw Exception('Fetch Data Error');
+  // }
+
+  // var selectedValue;
+
+  // Future<List<DocumentTypeModel>> getSelectUser() async {
+  //   try {
+  //     final res = await http.get(
+  //         Uri.parse(
+  //             'https://fly-manager-dev-api.azurewebsites.net/api/Document/getDetails?id=00000000-0000-0000-0000-000000000000'),
+  //         headers: {'accept': '*/*', 'authorization': "$accessToken"});
+  //     final body = json.decode('${res.body}') as List;
+  //     if (res.statusCode == 200) {
+  //       return body.map((e) {
+  //         final map = e as Map;
+  //         return DocumentTypeModel();
+  //       }).toList();
+  //     }
+  //   } catch (e) {
+  //     debugPrint('========> $e');
+  //   }
+  //   throw Exception('Fetch Data Null');
+  // }
+  
+  Future<List<DocumentTypeModel>> getSelectUser() async {
     try {
-      await Provider.of<DocumentProvider>(context, listen: false)
-          .getDocumentType(context);
-      final postMdl = Provider.of<DocumentProvider>(context, listen: false);
-      setState(() {
-        lists = postMdl.docListModel.data!.modulesList!.map((e) => e.name).toList();
-      });
-    } catch (error) {
-      debugPrint("Error fetching doc data: $error");
+      final res = await http.get(
+        Uri.parse(
+          'https://fly-manager-dev-api.azurewebsites.net/api/Document/getDetails?id=00000000-0000-0000-0000-000000000000',
+        ),
+        headers: {
+          'accept': '*/*',
+          'authorization': "$accessToken"
+        },
+      );
+      if (res.statusCode == 200) {
+        final data = json.decode(res.body);
+        if (data is List) {
+          return data.map((e) {
+            return DocumentTypeModel.fromJson(e as Map<String, dynamic>,);
+          }).toList();
+        }
+      }
+    } catch (e) {
+      debugPrint('========> $e');
     }
+    throw Exception();
   }
 
 
-@override
+  List<DocumentTypeModel> _dataList = [];
+  String? _selectedValue;
+
+
+
+
+  Future<void> _loadData() async {
+    final posts = await ApiService().getDocumentType(context);
+    setState(() {
+      _dataList = posts;
+    });
+  }
+
+  @override
   void initState() {
-    _fetchDocType();
+    _loadData();
     super.initState();
   }
-
 
 
   @override
   Widget build(BuildContext context) {
     String formattedDate = DateFormat.yMd().format(selectedDate);
     String formattedDates = DateFormat.yMd().format(_selectedDate);
+    final postMdl = Provider.of<DocumentProvider>(context);
+    debugPrint('--------> $accessToken');
 
     return Scaffold(
       backgroundColor: Colors.grey.shade200,
@@ -207,44 +281,100 @@ class _UploadDocumentState extends State<UploadDocument> {
                         height: 40,
                         width: MediaQuery.of(context).size.width,
                         decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.grey,
-                            ),
-                            borderRadius: BorderRadius.circular(3)),
-                        child: DropdownButton(
-                          isExpanded: true,
-                            value: dropdownValues,
-                            hint: Text('Select Document Type'),
-                            icon: Icon(
-                            Icons.arrow_drop_down_sharp,
+                          border: Border.all(
                             color: Colors.grey,
-                            ),
-                      onChanged: (value) {
-                      dropdownValues;
-                      setState(() {});
-                      },
-                      // items: snapshot.data!.map((e) {
-                      //   return DropdownMenuItem(child: Text(e.data!.modulesList.toString()),
-                      //   );
-                      //
-                      // }).toList(),
-
-                      items: lists
-                          .map((values) {
-                        return DropdownMenuItem<String>(
-                          value: values,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 10),
-                            child: Text(_fetchDocType().toString()),
                           ),
-                        );
-                      }).toList(),
+                          borderRadius: BorderRadius.circular(3),
+                        ),
 
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton(
+                            icon: const Icon(Icons.arrow_drop_down_sharp, color: Colors.grey,),
+                            hint: const Row(
+                              children: [
+                                SizedBox(width: 10,),
+                                Text('Select Document Type', style: TextStyle(fontSize: 14),),
+                              ],
+                            ),
+                            isExpanded: true,
+                            value: _selectedValue,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedValue = value;
+                              });
+                            },
+                            items: _dataList.map((item) {
+                              return DropdownMenuItem(
+                                value: item.data!.toString(),
+                                child: Text('${item.data}'),
+                              );
+                            }).toList(),
+                          ),
+                        ),
 
-                      ),
+                        // child: FutureBuilder<List<DocumentTypeModel>>(
+                        //   future: getSelectUser(),
+                        //   builder: (context, snapshot) {
+                        //     if (snapshot.hasData) {
+                        //       return DropdownButtonHideUnderline(
+                        //         child: ButtonTheme(
+                        //           alignedDropdown: true,
+                        //           child: DropdownButton<String>(
+                        //             value: dropdownValues,
+                        //             icon: const Icon(
+                        //               Icons.arrow_drop_down_sharp,
+                        //               color: Colors.grey,
+                        //             ),
+                        //             hint: const Text('Select Document Type'),
+                        //             items: snapshot.data!.map(
+                        //               (item) {
+                        //                 return DropdownMenuItem(
+                        //                   value: item.data!.name.toString(),
+                        //                   child:
+                        //                       Text(item.data!.name),
+                        //                 );
+                        //               },
+                        //             ).toList(),
+                        //             onChanged: (String? value) {
+                        //               setState(() {
+                        //                 dropdownValues = value;
+                        //               });
+                        //             },
+                        //           ),
+                        //         ),
+                        //       );
+                        //     } else if (snapshot.hasError) {
+                        //       return Text('Error: ${snapshot.error}');
+                        //     } else {
+                        //       return Text('No Data');
+                        //     }
+                        //   },
+                        // ),
 
-
-
+                        //  child: DropdownButton<String>(
+                        //    isExpanded: true,
+                        //    value: dropdownValues,
+                        //    icon: const Icon(
+                        //      Icons.arrow_drop_down_sharp,
+                        //      color: Colors.grey,
+                        //    ),
+                        //    onChanged: (String? values) {
+                        //      setState(() {
+                        //        dropdownValues = values;
+                        //      });
+                        //    },
+                        // items: [],
+                        // items: lists
+                        //     .map<DropdownMenuItem<String>>((values) {
+                        //   return DropdownMenuItem<String>(
+                        //     value: values,
+                        //     child: Padding(
+                        //       padding: const EdgeInsets.only(left: 10),
+                        //       child: Text(values ?? ""),
+                        //     ),
+                        //   );
+                        // }).toList(),
+                        //  ),
                       ),
                       const SizedBox(
                         height: 10,
@@ -265,28 +395,43 @@ class _UploadDocumentState extends State<UploadDocument> {
                               color: Colors.grey,
                             ),
                             borderRadius: BorderRadius.circular(3)),
-                        child: DropdownButton<String>(
-                          isExpanded: true,
-                          value: dropdownValue,
-                          icon: Icon(
-                            Icons.arrow_drop_down_sharp,
-                            color: Colors.grey,
-                          ),
-                          onChanged: (String? value) {
-                            setState(() {
-                              dropdownValue = value!;
-                            });
-                          },
-                          items: list
-                              .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 10),
-                                child: Text(value),
+                        child: DropdownButtonHideUnderline(
+                          child: ButtonTheme(
+                            child: DropdownButton<String>(
+                              hint: const Row(
+                                children: [
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(
+                                    'Select User',
+                                    style: TextStyle(fontSize: 14),
+                                  ),
+                                ],
                               ),
-                            );
-                          }).toList(),
+                              isExpanded: true,
+                              value: dropdownValue,
+                              icon: Icon(
+                                Icons.arrow_drop_down_sharp,
+                                color: Colors.grey,
+                              ),
+                              onChanged: (String? value) {
+                                setState(() {
+                                  dropdownValue = value!;
+                                });
+                              },
+                              items: list
+                                  .map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: Text(value),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(
@@ -577,7 +722,7 @@ class _UploadDocumentState extends State<UploadDocument> {
                     },
                     child: Container(
                       height: 40,
-                      width: 180,
+                      width: 155,
                       decoration: BoxDecoration(
                           border: Border.all(color: const Color(0xFF1E374F)),
                           borderRadius: BorderRadius.circular(5)),
@@ -597,7 +742,7 @@ class _UploadDocumentState extends State<UploadDocument> {
                     onTap: () async {},
                     child: Container(
                       height: 40,
-                      width: 180,
+                      width: 155,
                       decoration: BoxDecoration(
                           color: const Color(0xFF1E374F),
                           borderRadius: BorderRadius.circular(5)),
