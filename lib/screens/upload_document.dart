@@ -1,11 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:authentication/models/select_user_model.dart';
 import 'package:authentication/provider/document_provider.dart';
-import 'package:authentication/provider/selectuser_provider.dart';
 import 'package:authentication/services/api_service.dart';
-import 'package:authentication/widgets/customdropdownbutton.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -151,23 +147,22 @@ class _UploadDocumentState extends State<UploadDocument> {
   //   }
   //   throw Exception('Fetch Data Null');
   // }
-  
+
   Future<List<DocumentTypeModel>> getSelectUser() async {
     try {
       final res = await http.get(
         Uri.parse(
           'https://fly-manager-dev-api.azurewebsites.net/api/Document/getDetails?id=00000000-0000-0000-0000-000000000000',
         ),
-        headers: {
-          'accept': '*/*',
-          'authorization': "$accessToken"
-        },
+        headers: {'accept': '*/*', 'authorization': "$accessToken"},
       );
       if (res.statusCode == 200) {
         final data = json.decode(res.body);
         if (data is List) {
           return data.map((e) {
-            return DocumentTypeModel.fromJson(e as Map<String, dynamic>,);
+            return DocumentTypeModel.fromJson(
+              e as Map<String, dynamic>,
+            );
           }).toList();
         }
       }
@@ -177,17 +172,13 @@ class _UploadDocumentState extends State<UploadDocument> {
     throw Exception();
   }
 
-
-  List<DocumentTypeModel> _dataList = [];
+  List<DocumentTypeModel> _posts = [];
   String? _selectedValue;
-
-
-
 
   Future<void> _loadData() async {
     final posts = await ApiService().getDocumentType(context);
     setState(() {
-      _dataList = posts;
+      _posts = posts as List<DocumentTypeModel>;
     });
   }
 
@@ -197,12 +188,11 @@ class _UploadDocumentState extends State<UploadDocument> {
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
     String formattedDate = DateFormat.yMd().format(selectedDate);
     String formattedDates = DateFormat.yMd().format(_selectedDate);
-    final postMdl = Provider.of<DocumentProvider>(context);
+    Provider.of<DocumentProvider>(context);
     debugPrint('--------> $accessToken');
 
     return Scaffold(
@@ -289,11 +279,19 @@ class _UploadDocumentState extends State<UploadDocument> {
 
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton(
-                            icon: const Icon(Icons.arrow_drop_down_sharp, color: Colors.grey,),
+                            icon: const Icon(
+                              Icons.arrow_drop_down_sharp,
+                              color: Colors.grey,
+                            ),
                             hint: const Row(
                               children: [
-                                SizedBox(width: 10,),
-                                Text('Select Document Type', style: TextStyle(fontSize: 14),),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  'Select Document Type',
+                                  style: TextStyle(fontSize: 14),
+                                ),
                               ],
                             ),
                             isExpanded: true,
@@ -303,7 +301,7 @@ class _UploadDocumentState extends State<UploadDocument> {
                                 _selectedValue = value;
                               });
                             },
-                            items: _dataList.map((item) {
+                            items: _posts.map((item) {
                               return DropdownMenuItem(
                                 value: item.data!.toString(),
                                 child: Text('${item.data}'),
@@ -420,8 +418,8 @@ class _UploadDocumentState extends State<UploadDocument> {
                                   dropdownValue = value!;
                                 });
                               },
-                              items: list
-                                  .map<DropdownMenuItem<String>>((String value) {
+                              items: list.map<DropdownMenuItem<String>>(
+                                  (String value) {
                                 return DropdownMenuItem<String>(
                                   value: value,
                                   child: Padding(
